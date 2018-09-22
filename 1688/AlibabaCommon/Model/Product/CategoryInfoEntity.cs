@@ -8,6 +8,7 @@ namespace Model.Product
 {
     public class CategoryInfoEntity
     {
+        public int ID { get; set; }
         /// <summary>
         /// 类目ID
         /// </summary>

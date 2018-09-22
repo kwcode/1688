@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BD784D1C-29D5-4F1B-AF5D-F7352CC3FBD1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AlibabaCommon</RootNamespace>
+    <AssemblyName>AlibabaCommon</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\..\K_酷飞鱼\KuCMS\Lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\APIClient.cs" />
+    <Compile Include="Model\Product\AttributeInfoEntity.cs" />
+    <Compile Include="Model\Product\AttributeValueInfoEntity.cs" />
+    <Compile Include="Model\Product\CategoryInfoEntity.cs" />
+    <Compile Include="Model\Product\CategoryResult.cs" />
+    <Compile Include="Model\Product\PostLevelAttrRelEntity.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="sdk\APIFacade.cs" />
+    <Compile Include="sdk\APIId.cs" />
+    <Compile Include="sdk\entity\AuthorizationToken.cs" />
+    <Compile Include="sdk\entity\ErrorExceptionDesc.cs" />
+    <Compile Include="sdk\entity\ResponseStatus.cs" />
+    <Compile Include="sdk\entity\ResponseWrapper.cs" />
+    <Compile Include="sdk\exception\OceanException.cs" />
+    <Compile Include="sdk\http\HttpClient.cs" />
+    <Compile Include="sdk\policy\ClientPolicy.cs" />
+    <Compile Include="sdk\policy\GrantType.cs" />
+    <Compile Include="sdk\policy\Protocol.cs" />
+    <Compile Include="sdk\policy\RequestPolicy.cs" />
+    <Compile Include="sdk\primitive\NullableBool.cs" />
+    <Compile Include="sdk\primitive\NullableByte.cs" />
+    <Compile Include="sdk\primitive\NullableChar.cs" />
+    <Compile Include="sdk\primitive\NullableDateTime.cs" />
+    <Compile Include="sdk\primitive\NullableDouble.cs" />
+    <Compile Include="sdk\primitive\NullableFloat.cs" />
+    <Compile Include="sdk\primitive\NullableInt.cs" />
+    <Compile Include="sdk\primitive\NullableLong.cs" />
+    <Compile Include="sdk\primitive\NullablePrimitiveObject.cs" />
+    <Compile Include="sdk\Request.cs" />
+    <Compile Include="sdk\Response.cs" />
+    <Compile Include="sdk\serialize\DeSerializer.cs" />
+    <Compile Include="sdk\serialize\Json2Deserializer.cs" />
+    <Compile Include="sdk\serialize\Param2RequestSerializer.cs" />
+    <Compile Include="sdk\serialize\Serializer.cs" />
+    <Compile Include="sdk\serialize\SerializerProvider.cs" />
+    <Compile Include="sdk\SyncAPIClient.cs" />
+    <Compile Include="sdk\util\DateUtil.cs" />
+    <Compile Include="sdk\util\SignatureUtil.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
