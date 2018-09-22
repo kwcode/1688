@@ -12,71 +12,20 @@ namespace DAL
     public class DALUtil
     {
         #region 获取数据库连接字符串
-        private static string GetTxt(string path)
-        {
-            try
-            {
-                System.IO.FileStream fsr = System.IO.File.OpenRead(path);
-                System.IO.StreamReader sr = new System.IO.StreamReader(fsr);
-                string record = sr.ReadLine();
-                sr.Close();
-                sr.Dispose();
-                fsr.Close();
-                fsr.Dispose();
-                return record;
-            }
-            catch (Exception ex)
-            {
-                return "";
-            }
-
-        }
-
-        /// <summary>
-        /// 获取数据库连接字符串
-        /// </summary>
-        public static string ConnString
-        {
-            get
-            {
-                string path = ConfigurationManager.ConnectionStrings["ConnString1"].ConnectionString;
-                string connString = GetTxt(path);
-                return connString;
-            }
-        }
-        public static string ConnString_CMS_TongJi
-        {
-            get
-            {
-                string path = ConfigurationManager.ConnectionStrings["ConnString_CMS_TongJi"].ConnectionString;
-                string connString = GetTxt(path);
-                return connString;
-            }
-        }
+       
         /// <summary>
         /// 公共库 Ku_Common
         /// </summary>
-        public static string ConnString_Ku_Common
+        public static string ConnString_1688
         {
             get
             {
-                string path = ConfigurationManager.ConnectionStrings["ConnString_Ku_Common"].ConnectionString;
-                string connString = GetTxt(path);
+                string connString = ConfigurationManager.ConnectionStrings["ConnString_1688"].ConnectionString;
+               
                 return connString;
             }
         }
-        /// <summary>
-        /// 中间处理库
-        /// </summary>
-        public static string ConnString_CMS_Process
-        {
-            get
-            {
-                string path = ConfigurationManager.ConnectionStrings["ConnString_CMS_Process"].ConnectionString;
-                string connString = GetTxt(path);
-                return connString;
-            }
-        }
+       
 
 
         #endregion

@@ -35,9 +35,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\..\..\K_酷飞鱼\KuCMS\Lib\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -55,11 +52,17 @@
   <ItemGroup>
     <Compile Include="DAL\AttributeInfoDAL.cs" />
     <Compile Include="DAL\AttributeValueInfoDAL.cs" />
-    <Compile Include="DAL\CategoryInfo2DAL.cs" />
-    <Compile Include="DAL\CategoryInfoDAL.cs" />
+    <Compile Include="DAL\CategoryInfoDAL.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DAL\DALUtil.cs" />
     <Compile Include="DAL\FileHelper.cs" />
     <Compile Include="DAL\KeyDAL.cs" />
+    <Compile Include="DBCommon\DBHelper.cs" />
+    <Compile Include="DBCommon\DBUtil.cs" />
+    <Compile Include="DBCommon\KuParameter.cs" />
+    <Compile Include="DBCommon\LogException.cs" />
+    <Compile Include="DBCommon\Logs.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -70,12 +73,6 @@
     <Compile Include="Model\CategoryInfo2Entity.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="testForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="testForm.Designer.cs">
-      <DependentUpon>testForm.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -89,9 +86,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="testForm.resx">
-      <DependentUpon>testForm.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
@@ -106,10 +100,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\K_酷飞鱼\KuCMS\Common\DBCommon\DBCommon.csproj">
-      <Project>{f8de3697-5ef6-45dc-94d3-a234eb853ad8}</Project>
-      <Name>DBCommon</Name>
-    </ProjectReference>
     <ProjectReference Include="..\AlibabaCommon\AlibabaCommon.csproj">
       <Project>{bd784d1c-29d5-4f1b-af5d-f7352cc3fbd1}</Project>
       <Name>AlibabaCommon</Name>

@@ -67,11 +67,11 @@ namespace _1688
             List<CategoryInfoEntity> list = DAL.CategoryInfoDAL.GetList("*", 2, "categoryID");
             int index = 0;
 
-            foreach (CategoryInfoEntity itemEntity in list)
+            foreach (long categoryID in needAddList)
             {
                 try
                 {
-                    CategoryResult resultCategory1 = apiClient.GetCategoryID(itemEntity.categoryID);
+                    CategoryResult resultCategory1 = apiClient.GetCategoryID(categoryID);
                     index++;
                     long[] array = resultCategory1.categoryInfo[0].childIDs;
                     if (array != null && array.Length > 0)
@@ -86,10 +86,10 @@ namespace _1688
                                 {
 
                                 }
-                                long categoryID = resultCategory.categoryInfo[0].categoryID;
+                                //long categoryID = resultCategory.categoryInfo[0].categoryID;
                                 string name = resultCategory.categoryInfo[0].name;
                                 int level = 3;
-                                long parentID = itemEntity.categoryID;
+                                long parentID = resultCategory.categoryInfo[0].parentIDs[0];// itemEntity.categoryID;
 
                                 if (index >= 4900)
                                 {
@@ -100,13 +100,13 @@ namespace _1688
                                 if (cont == 0)
                                 {
                                     DAL.CategoryInfoDAL.Add(categoryID, name, parentID, level);
-                                    msg(itemEntity.name + "->【3级】" + name);
+                                    //msg(itemEntity.name + "->【3级】" + name);
 
                                     GO(resultCategory.categoryInfo[0].childIDs, categoryID, name);
                                 }
                                 else
                                 {
-                                    msg("存在" + itemEntity.name + "->【3级】" + name);
+                                    //msg("存在" + itemEntity.name + "->【3级】" + name);
                                 }
                             }
                             catch (Exception)

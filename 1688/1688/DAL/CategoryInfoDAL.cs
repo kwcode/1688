@@ -20,7 +20,7 @@ namespace DAL
         /// <summary>
         ///数据库连接字符串
         /// <summary>
-        private static string ConnString = DALUtil.ConnString_Ku_Common;
+        private static string ConnString = DALUtil.ConnString_1688;
 
         #region TCode生成的 方法
 
