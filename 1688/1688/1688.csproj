@@ -55,9 +55,11 @@
     <Compile Include="DAL\CategoryInfoDAL.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DAL\Category_Attr_RelatedDAL.cs" />
     <Compile Include="DAL\DALUtil.cs" />
     <Compile Include="DAL\FileHelper.cs" />
     <Compile Include="DAL\KeyDAL.cs" />
+    <Compile Include="DAL\PostLevelAttrRelDAL.cs" />
     <Compile Include="DBCommon\DBHelper.cs" />
     <Compile Include="DBCommon\DBUtil.cs" />
     <Compile Include="DBCommon\KuParameter.cs" />
@@ -71,6 +73,7 @@
     </Compile>
     <Compile Include="Global.cs" />
     <Compile Include="Model\CategoryInfo2Entity.cs" />
+    <Compile Include="Model\Class1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

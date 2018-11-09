@@ -38,13 +38,14 @@ namespace DAL
         /// <param name="aspect">产品属性</param>
         /// <param name="isSKUAttribute">该属性能否当成SKU属性</param>
         /// <returns></returns>
-        public static int Add(long attrID, string name, int required, string units, string inputType, string parentAttrID, string parentAttrValueID, string aspect, int isSKUAttribute)
+        public static int Add(long categoryID, long attrID, string name, int required, string units, string inputType, string parentAttrID, string parentAttrValueID, string aspect, int isSKUAttribute)
         {
 
             SqlParameter[] pramsAdd =
 			{
 				DAL.DALUtil.MakeInParam("@CreateTS",System.Data.SqlDbType.DateTime,8,DateTime.Now),
-				DAL.DALUtil.MakeInParam("@attrID",System.Data.SqlDbType.Int,4,attrID),
+                DAL.DALUtil.MakeInParam("@categoryID",System.Data.SqlDbType.BigInt,4,categoryID),
+				DAL.DALUtil.MakeInParam("@attrID",System.Data.SqlDbType.BigInt,4,attrID),
 				DAL.DALUtil.MakeInParam("@name",System.Data.SqlDbType.NVarChar,100,name),
 				DAL.DALUtil.MakeInParam("@required",System.Data.SqlDbType.Int,4, required),
 				DAL.DALUtil.MakeInParam("@units",System.Data.SqlDbType.NVarChar,100, units),
@@ -58,6 +59,27 @@ namespace DAL
             return DBCommon.DBHelper.Add(ConnString, TableName, pramsAdd);
         }
 
+        public static int Modify(long categoryID, long attrID, string name, int required, string units, string inputType, string parentAttrID, string parentAttrValueID, string aspect, int isSKUAttribute)
+        {
+
+            SqlParameter[] pramsModify =
+			{ 
+                DAL.DALUtil.MakeInParam("@categoryID",System.Data.SqlDbType.BigInt,4,categoryID), 
+				DAL.DALUtil.MakeInParam("@name",System.Data.SqlDbType.NVarChar,100,name),
+				DAL.DALUtil.MakeInParam("@required",System.Data.SqlDbType.Int,4, required),
+				DAL.DALUtil.MakeInParam("@units",System.Data.SqlDbType.NVarChar,100, units),
+				DAL.DALUtil.MakeInParam("@inputType",System.Data.SqlDbType.NVarChar,100, inputType),
+				DAL.DALUtil.MakeInParam("@parentAttrID",System.Data.SqlDbType.NVarChar,100, parentAttrID),
+				DAL.DALUtil.MakeInParam("@parentAttrValueID",System.Data.SqlDbType.NVarChar,100, parentAttrValueID),
+				DAL.DALUtil.MakeInParam("@aspect",System.Data.SqlDbType.NVarChar,100, aspect),
+				DAL.DALUtil.MakeInParam("@isSKUAttribute",System.Data.SqlDbType.Int,4, isSKUAttribute),
+			};
+            SqlParameter[] pramsWhere =
+			{
+				DAL.DALUtil.MakeInParam("@attrID",System.Data.SqlDbType.BigInt,4,attrID),
+			};
+            return DBCommon.DBHelper.Modify(ConnString, TableName, pramsModify,pramsWhere);
+        }
 
         #endregion
 
@@ -72,6 +94,7 @@ namespace DAL
             return count > 0;
         }
         #endregion
+
         #region 修改
         /// <summary>
         /// 修改
@@ -156,6 +179,20 @@ namespace DAL
                 SqlParameter[] pramsWhere =
 				{
 					DALUtil.MakeInParam("@ID", SqlDbType.Int, 4, ID)
+				};
+                return Get1(SelectIF, pramsWhere);
+            }
+            catch { return null; }
+        }
+
+        public static AttributeInfoEntity Get_98(long attrID, string SelectIF)
+        {
+            try
+            {
+                //参数Where条件
+                SqlParameter[] pramsWhere =
+				{
+					DALUtil.MakeInParam("@attrID", SqlDbType.Int, 4, attrID)
 				};
                 return Get1(SelectIF, pramsWhere);
             }

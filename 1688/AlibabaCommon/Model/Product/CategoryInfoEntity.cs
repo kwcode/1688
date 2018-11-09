@@ -20,7 +20,7 @@ namespace Model.Product
         /// <summary>
         /// 类目英文名称，1688无此内容
         /// </summary>
-        public string enName { get; set; }
+        //public string enName { get; set; }
         /// <summary>
         /// 类目层级，1688无此内容
         /// </summary>
@@ -37,5 +37,7 @@ namespace Model.Product
         /// 子类目ID数组，1688无此内容
         /// </summary>
         public long[] childIDs { get; set; }
+
+        public ChildCategorysEntity[] childCategorys { get; set; }
     }
 }

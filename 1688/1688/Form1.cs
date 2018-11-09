@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -41,119 +42,87 @@ namespace _1688
                 MessageBox.Show(ex.ToString());
             }
         }
-
+        private APIClient apiClient;
         private void DoThreadTask()
         {
-            int apiCount = 0;
             KeyEntity keyEntity = keyList.Dequeue();
-            APIClient apiClient = new Common.APIClient(keyEntity.AppKey, keyEntity.SecretKey);
-
-            #region 调用API获取所有一级类目 检测 返回需要新增的一类ID集合
-
-            CategoryResult category1List = apiClient.GetCategoryID(0);
-            long[] category1_IDs = category1List.categoryInfo[0].childIDs;
-            apiCount++;
-            List<long> needAddList = new List<long>();
-            foreach (long item in category1_IDs)
+            apiClient = new Common.APIClient(keyEntity.AppKey, keyEntity.SecretKey);
+            GoChildGategory(0, 0);
+            msg("执行完毕");
+        }
+        /// <summary>
+        /// 执行下级分类
+        /// </summary>
+        private void GoChildGategory(long pid, int level)
+        {
+            try
             {
-                int cont = DAL.CategoryInfoDAL.GetSingle("count(0)", "categoryID={0}", item);
-                if (cont <= 0)
+
+                ApiResult entity = apiClient.GetCategoryID(pid);
+                Thread.Sleep(300);
+                if (entity == null)
                 {
-                    needAddList.Add(item);
+                    KeyEntity keyEntity = keyList.Dequeue();
+                    apiClient = new Common.APIClient(keyEntity.AppKey, keyEntity.SecretKey);
+                    entity = apiClient.GetCategoryID(pid);
                 }
-            }
-            #endregion
-
-            List<CategoryInfoEntity> list = DAL.CategoryInfoDAL.GetList("*", 2, "categoryID");
-            int index = 0;
-
-            foreach (long categoryID in needAddList)
-            {
-                try
+                CategoryInfoEntity categoryInfo_1688 = entity.categoryInfo[0];
+                if (categoryInfo_1688 != null)
                 {
-                    CategoryResult resultCategory1 = apiClient.GetCategoryID(categoryID);
-                    index++;
-                    long[] array = resultCategory1.categoryInfo[0].childIDs;
-                    if (array != null && array.Length > 0)
+                    if (categoryInfo_1688.categoryID > 0)
                     {
-                        foreach (long item in array)
+                        long parentID = categoryInfo_1688.parentIDs[0];
+                        #region 保存到数据库
+
+                        SqlParameter[] pramsWhere =
+			                {
+				                DALUtil.MakeInParam("@categoryID",SqlDbType.Int,4,categoryInfo_1688.categoryID)
+			                 };
+                        CategoryInfoEntity categoryEntity = DAL.CategoryInfoDAL.Get1("categoryID", pramsWhere);
+                        if (categoryEntity != null && categoryEntity.categoryID > 0)
                         {
-                            try
+                            DAL.CategoryInfoDAL.Modify(categoryInfo_1688.categoryID, categoryInfo_1688.name, parentID, level, categoryInfo_1688.isLeaf);
+                            msg("存在===" + categoryInfo_1688.name + "->【" + level + "级】" + categoryInfo_1688.name);
+                        }
+                        else
+                        {
+                            DAL.CategoryInfoDAL.Add(categoryInfo_1688.categoryID, categoryInfo_1688.name, parentID, level, categoryInfo_1688.isLeaf);
+                            msg("已添加===" + "->【" + level + "级】" + categoryInfo_1688.name);
+                        }
+                        #endregion
+                    }
+
+                    //执行子级查询
+                    ChildCategorysEntity[] childCategorys = categoryInfo_1688.childCategorys;
+                    if (childCategorys != null && childCategorys.Length > 0)
+                    {
+                        if (childCategorys != null && childCategorys.Length > 0)
+                        {
+                            foreach (ChildCategorysEntity item in childCategorys)
                             {
-                                CategoryResult resultCategory = apiClient.GetCategoryID(item);
-                                index++;
-                                if (!string.IsNullOrEmpty(resultCategory.errorMsg))
-                                {
-
-                                }
-                                //long categoryID = resultCategory.categoryInfo[0].categoryID;
-                                string name = resultCategory.categoryInfo[0].name;
-                                int level = 3;
-                                long parentID = resultCategory.categoryInfo[0].parentIDs[0];// itemEntity.categoryID;
-
-                                if (index >= 4900)
-                                {
-
-                                }
-                                //导入一类
-                                int cont = DAL.CategoryInfoDAL.GetSingle("count(0)", "categoryID={0}", categoryID);
-                                if (cont == 0)
-                                {
-                                    DAL.CategoryInfoDAL.Add(categoryID, name, parentID, level);
-                                    //msg(itemEntity.name + "->【3级】" + name);
-
-                                    GO(resultCategory.categoryInfo[0].childIDs, categoryID, name);
-                                }
-                                else
-                                {
-                                    //msg("存在" + itemEntity.name + "->【3级】" + name);
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                index = 0;
-                                apiClient = new Common.APIClient("8746098", "0QYAZkXsM8");
-                                continue;
-                                throw;
+                                GoChildGategory(item.id, level + 1);
                             }
                         }
                     }
-
                 }
-                catch (Exception ex)
-                {
 
-                    throw;
-                }
             }
-
-        }
-
-
-        public void GO(long[] array, long parentID, string pName)
-        {
-            Common.APIClient apiClient = new Common.APIClient();
-            if (array != null && array.Length > 0)
+            catch (Exception ex)
             {
-                foreach (long item in array)
+                KeyEntity keyEntity = keyList.Dequeue();
+                if (keyEntity != null)
                 {
-                    try
-                    {
-                        CategoryResult resultCategory = apiClient.GetCategoryID(item);
-                        long categoryID = resultCategory.categoryInfo[0].categoryID;
-                        string name = resultCategory.categoryInfo[0].name;
-                        int level = 4;
-                        DAL.CategoryInfoDAL.Add(categoryID, name, parentID, level);
-                        msg(pName + "->【4级】" + name);
-                    }
-                    catch (Exception)
-                    {
-
-                        throw;
-                    }
+                    apiClient = new Common.APIClient(keyEntity.AppKey, keyEntity.SecretKey);
+                    GoChildGategory(pid, level);
                 }
+                else
+                {
+                    msg("-----------没有可用账号");
+                }
+
             }
         }
+
         #endregion
 
         #region 采集类目下面的属性和选项
@@ -173,106 +142,151 @@ namespace _1688
         private void DoAttributeTask()
         {
 
-            int apiCount = 0;
+            //循环类目 获取对应的属性 
             KeyEntity keyEntity = keyList.Dequeue();
-            APIClient apiClient = new Common.APIClient(keyEntity.AppKey, keyEntity.SecretKey);
-            string recordFileName = "AttributeTask_Page";
+            apiClient = new Common.APIClient(keyEntity.AppKey, keyEntity.SecretKey);
+            //GoChildGategory(0, 0);
+            //msg("执行完毕");
+
             while (true)
             {
-                int pageIndex = 1;
-                string record = DAL.FileHelper.Read(recordFileName);
-                if (!string.IsNullOrWhiteSpace(record))
-                {
-                    pageIndex = Convert.ToInt32(record);
-                }
-                List<CategoryInfoEntity> list = DAL.CategoryInfoDAL.GetPageList(pageIndex, 1, "*", "ID", "level=3");
+                List<CategoryInfoEntity> list = DAL.CategoryInfoDAL.GetList_9();
                 if (list == null || list.Count <= 0)
                 {
                     break;
                 }
-                CategoryInfoEntity entity = list[0];
-
-                try
+                foreach (CategoryInfoEntity item in list)
                 {
-                    CategoryResult attributeInfo = apiClient.GetAttributeInfo(entity.categoryID);
-                    apiCount++;
-                    if (attributeInfo.errorMsg == "不能找到类目信息")
-                    {
-                        msg(entity.name + "---" + attributeInfo.errorMsg);
-                        pageIndex++;
-                        DAL.FileHelper.Write(recordFileName, pageIndex);
-                        continue;
+                    GoAttribute(item.categoryID);
+                    DAL.CategoryInfoDAL.Modify_Process(item.ID);
+                }
+            }
+            msg("执行完毕");
 
-                    }
-                    else if (attributeInfo.errorMsg != null)
-                    {
-                        msg(attributeInfo.errorMsg);
-                        Thread.Sleep(10000000);
-                        continue;
-                    }
+        }
 
-                    if (apiCount > keyEntity.ApiCount)//超过最大调用次数
-                    {
-                        msg("正在切换账号...");
-                        Thread.Sleep(10000);
-                        keyEntity = keyList.Dequeue();
-                        apiClient = new Common.APIClient(keyEntity.AppKey, keyEntity.SecretKey);
-                        apiCount = 0;
-                        continue;
-                    }
-                    //类目属性信息 列表
+        private void GoAttribute(long categoryID)
+        {
+            try
+            {
+                ApiResult attributeInfo = apiClient.GetAttributeInfo(categoryID);
+                Thread.Sleep(200);
+                if (attributeInfo != null)
+                {
+                    #region 属性
+
                     AttributeInfoEntity[] attributes = attributeInfo.attributes;
+
                     if (attributes.Length > 0)
                     {
+                        int index = 0;
                         foreach (AttributeInfoEntity item in attributes)
                         {
-                            //增加 类目属性信息
-                            if (!DAL.AttributeInfoDAL.IsExist(item.attrID))
-                            {
-                                string units = string.Empty;
-                                if (item.units != null && item.units.Length > 0)
-                                {
-                                    units = string.Join(",", item.units);
-                                }
+                            //try
+                            //{
+                            index++;
 
-                                int row_Add = DAL.AttributeInfoDAL.Add(item.attrID, item.name, Convert.ToInt32(item.required), units, item.inputType, item.parentAttrID, item.parentAttrValueID, item.aspect, Convert.ToInt32(item.isSKUAttribute));
-                                msg("******增加属性" + item.name);
-                            }
-                            //增加类目属性对应的 选项
-                            AttributeValueInfoEntity[] attributeValueInfoEntity = item.attrValues;
-                            if (attributeValueInfoEntity.Length > 0)
+                            #region 类目下的属性
+
+                            string units = string.Empty;
+                            if (item.units != null && item.units.Length > 0)
                             {
-                                foreach (AttributeValueInfoEntity itemValue in attributeValueInfoEntity)
+                                units = string.Join(",", item.units);
+                            }
+
+                            AttributeInfoEntity attrEntity = DAL.AttributeInfoDAL.Get_98(item.attrID, "attrID");
+                            if (attrEntity != null && attrEntity.attrID > 0)
+                            {
+                                //int row_Mod = DAL.AttributeInfoDAL.Modify(categoryID, item.attrID, item.name, Convert.ToInt32(item.required), units, item.inputType, item.parentAttrID, item.parentAttrValueID, item.aspect, Convert.ToInt32(item.isSKUAttribute));
+                                //msg("******修改属性" + item.name);
+                            }
+                            else
+                            {
+                                int row_Add = DAL.AttributeInfoDAL.Add(categoryID, item.attrID, item.name, Convert.ToInt32(item.required), units, item.inputType, item.parentAttrID, item.parentAttrValueID, item.aspect, Convert.ToInt32(item.isSKUAttribute));
+                                msg("******属性-增加" + item.name);
+                            }
+                            #endregion
+
+                            #region 类目与属性关联中间表
+                            int count = Category_Attr_RelatedDAL.GetSingle("count(0)", "  categoryID={0} AND attrID={1} ", categoryID, item.attrID);
+                            if (count == 0)
+                            {
+                                Category_Attr_RelatedDAL.Add(categoryID, item.attrID);
+                                msg("******关联-增加====" + item.name);
+                            }
+                            #endregion
+
+                            #region 增加类目属性对应的 选项
+                            AttributeValueInfoEntity[] attrValueList = item.attrValues;
+                            if (attrValueList.Length > 0)
+                            {
+                                foreach (AttributeValueInfoEntity itemValue in attrValueList)
                                 {
-                                    if (!DAL.AttributeValueInfoDAL.IsExist(itemValue.attrValueID))
+                                    AttributeValueInfoEntity attrValueEntity = DAL.AttributeValueInfoDAL.Get_98(itemValue.attrValueID, "attrValueID");
+                                    if (attrValueEntity != null && attrValueEntity.attrValueID > 0)
+                                    {
+                                        //int row_Mod2 = DAL.AttributeValueInfoDAL.Modify(itemValue.attrValueID, itemValue.name, itemValue.enName, Convert.ToInt32(itemValue.isSKU));
+                                        //msg("#####修改选项:" + itemValue.name);
+                                    }
+                                    else
                                     {
                                         int row_Add2 = DAL.AttributeValueInfoDAL.Add(itemValue.attrValueID, itemValue.name, itemValue.enName, Convert.ToInt32(itemValue.isSKU));
-                                        msg("#####增加选项:" + itemValue.name);
+                                        msg("#####选项-增加:" + itemValue.name);
+                                    }
+                                }
+                            }
+                            #endregion
+
+
+                            //}
+                            //catch (Exception ex)
+                            //{
+
+                            //}
+
+                        }
+                    }
+
+                    #endregion
+
+                    #region 属性子级关联
+                    PostLevelAttrRelEntity[] levelAttrRelList = attributeInfo.levelAttrRelList;
+                    if (levelAttrRelList != null && levelAttrRelList.Length > 0)
+                    {
+                        foreach (PostLevelAttrRelEntity itemAttrRel in levelAttrRelList)
+                        {
+                            if (itemAttrRel.subFids != null && itemAttrRel.subFids.Length > 0)
+                            { 
+                                foreach (int subID in itemAttrRel.subFids)
+                                {
+                                    int count = PostLevelAttrRelDAL.GetSingle("count(0)", "  fid={0} AND subID={1} ", itemAttrRel.fid, subID);
+                                    if (count == 0)
+                                    {
+                                        PostLevelAttrRelDAL.Add(itemAttrRel.fid, subID, itemAttrRel.attrType);
+                                        msg("******属性子级关联-增加====" + itemAttrRel.fid);
                                     }
                                 }
                             }
                         }
                     }
-                    pageIndex++;
-                    DAL.FileHelper.Write(recordFileName, pageIndex);
-
-                    msg(entity.name + "执行完毕--------------");
-                    Thread.Sleep(1000);
-
+                    #endregion
                 }
-                catch (Exception ex)
+
+            }
+            catch (Exception)
+            {
+
+                KeyEntity keyEntity = keyList.Dequeue();
+                if (keyEntity != null)
                 {
-                    msg(ex.ToString());
-                    msg("正在切换账号...");
-                    Thread.Sleep(10000);
-                    keyEntity = keyList.Dequeue();
                     apiClient = new Common.APIClient(keyEntity.AppKey, keyEntity.SecretKey);
-                    apiCount = 0;
-                    continue;
+                    GoAttribute(categoryID);
+                }
+                else
+                {
+                    msg("-----------没有可用账号");
                 }
             }
-
-            msg("执行完毕");
 
         }
         #endregion

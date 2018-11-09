@@ -52,7 +52,8 @@
     <Compile Include="Model\Product\AttributeInfoEntity.cs" />
     <Compile Include="Model\Product\AttributeValueInfoEntity.cs" />
     <Compile Include="Model\Product\CategoryInfoEntity.cs" />
-    <Compile Include="Model\Product\CategoryResult.cs" />
+    <Compile Include="Model\Product\ApiResult.cs" />
+    <Compile Include="Model\Product\ChildCategorysEntity.cs" />
     <Compile Include="Model\Product\PostLevelAttrRelEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="sdk\APIFacade.cs" />

@@ -38,12 +38,26 @@ namespace DAL
             SqlParameter[] pramsAdd =
 			{
 				DAL.DALUtil.MakeInParam("@CreateTS",System.Data.SqlDbType.DateTime,8,DateTime.Now),
-				DAL.DALUtil.MakeInParam("@attrValueID",System.Data.SqlDbType.Int,4,attrValueID),
+				DAL.DALUtil.MakeInParam("@attrValueID",System.Data.SqlDbType.BigInt,4,attrValueID),
 				DAL.DALUtil.MakeInParam("@name",System.Data.SqlDbType.NVarChar,100,name),
 				DAL.DALUtil.MakeInParam("@enName",System.Data.SqlDbType.NVarChar,100,enName),
 				DAL.DALUtil.MakeInParam("@isSKU",System.Data.SqlDbType.Int,4,isSKU),
 			};
             return DBCommon.DBHelper.Add(ConnString, TableName, pramsAdd);
+        }
+        public static int Modify(long attrValueID, string name, string enName, int isSKU)
+        {
+            SqlParameter[] pramsModify =
+			{ 
+				DAL.DALUtil.MakeInParam("@name",System.Data.SqlDbType.NVarChar,100,name),
+				DAL.DALUtil.MakeInParam("@enName",System.Data.SqlDbType.NVarChar,100,enName),
+				DAL.DALUtil.MakeInParam("@isSKU",System.Data.SqlDbType.Int,4,isSKU),
+			};
+            SqlParameter[] pramsWhere =
+			{
+				DALUtil.MakeInParam("@attrValueID",SqlDbType.BigInt,4,attrValueID)
+			};
+            return DBCommon.DBHelper.Modify(ConnString, TableName, pramsModify, pramsWhere);
         }
 
         #region 检测是否存在
@@ -135,14 +149,14 @@ namespace DAL
         /// </summary>
         /// <param name="ID">ID</param>
         /// <param name="SelectIF">查询字段</param>
-        public static AttributeValueInfoEntity Get_99(int ID, string SelectIF)
+        public static AttributeValueInfoEntity Get_98(long attrValueID, string SelectIF)
         {
             try
             {
                 //参数Where条件
                 SqlParameter[] pramsWhere =
 				{
-					DALUtil.MakeInParam("@ID", SqlDbType.Int, 4, ID)
+					DALUtil.MakeInParam("@attrValueID", SqlDbType.BigInt, 4, attrValueID)
 				};
                 return Get1(SelectIF, pramsWhere);
             }
@@ -221,6 +235,8 @@ namespace DAL
 
 
         #endregion
+
+
 
     }
 }

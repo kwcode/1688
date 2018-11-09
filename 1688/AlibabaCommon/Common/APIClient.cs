@@ -34,7 +34,7 @@ namespace Common
 
         }
 
-        public T Send<T>(Request request, RequestPolicy policy)
+        private T Send<T>(Request request, RequestPolicy policy)
         {
             HttpClient httpClient = new HttpClient(clientPolicy);
             string jsonResult = httpClient.GetRequestResult(request, policy);
@@ -50,7 +50,7 @@ namespace Common
         /// </summary>
         /// <param name="categoryID">类目id,必须大于等于0， 如果为0，则查询所有一级类目</param>
         /// <returns></returns>
-        public CategoryResult GetCategoryID(long categoryID = 0)
+        public ApiResult GetCategoryID(long categoryID = 0)
         {
             APIId apiId = new APIId();
             apiId.Name = "alibaba.category.get";
@@ -66,13 +66,13 @@ namespace Common
             oauthPolicy.HttpMethod = "GET";
             oauthPolicy.UseHttps = true;
 
-            return Send<CategoryResult>(request, oauthPolicy);
+            return Send<ApiResult>(request, oauthPolicy);
 
         }
         #endregion
 
         #region 获取属性
-        public CategoryResult GetAttributeInfo(long categoryID = 0)
+        public ApiResult GetAttributeInfo(long categoryID = 0)
         {
             APIId apiId = new APIId();
             apiId.Name = "alibaba.category.attribute.get";
@@ -88,7 +88,7 @@ namespace Common
             oauthPolicy.HttpMethod = "GET";
             oauthPolicy.UseHttps = true;
 
-            return Send<CategoryResult>(request, oauthPolicy);
+            return Send<ApiResult>(request, oauthPolicy);
         }
         #endregion
     }

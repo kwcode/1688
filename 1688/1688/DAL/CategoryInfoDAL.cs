@@ -30,14 +30,16 @@ namespace DAL
         /// <summary>
         /// <param name="pramsAdd">参数</param>
         /// <returns>成功返回自增ID</returns>
-        public static int Add(long categoryID, string name, long parentID, int level)
+        public static int Add(long categoryID, string name, long parentID, int level, bool isLeaf)
         {
             SqlParameter[] pramsAdd =
             {
-				DALUtil.MakeInParam("@categoryID",SqlDbType.Int,4,categoryID),
+				DALUtil.MakeInParam("@categoryID",SqlDbType.BigInt,4,categoryID),
                 DALUtil.MakeInParam("@name",SqlDbType.NVarChar,100,name),
-                DALUtil.MakeInParam("@parentID",SqlDbType.Int,4,parentID),
+                DALUtil.MakeInParam("@parentID",SqlDbType.BigInt,4,parentID),
                 DALUtil.MakeInParam("@level",SqlDbType.Int,4,level),
+                DALUtil.MakeInParam("@isLeaf",SqlDbType.Int,4,(isLeaf==true?1:0)),
+                
 			};
             return DBCommon.DBHelper.Add2(ConnString, TableName, pramsAdd);
         }
@@ -52,8 +54,21 @@ namespace DAL
         /// <param name="pramsModify">修改参数集合</param>
         /// <param name="pramsWhere">条件集合</param>
         /// <returns>成功返回影响行数,失败返回0</returns>
-        public static int Modify(SqlParameter[] pramsModify, SqlParameter[] pramsWhere)
+        public static int Modify(long categoryID, string name, long parentID, int level, bool isLeaf)
         {
+            SqlParameter[] pramsModify =
+            {
+				DALUtil.MakeInParam("@categoryID",SqlDbType.Int,4,categoryID),
+                DALUtil.MakeInParam("@name",SqlDbType.NVarChar,100,name),
+                DALUtil.MakeInParam("@parentID",SqlDbType.Int,4,parentID),
+                DALUtil.MakeInParam("@level",SqlDbType.Int,4,level),
+                DALUtil.MakeInParam("@isLeaf",SqlDbType.Int,4,(isLeaf==true?1:0)),
+                
+			};
+            SqlParameter[] pramsWhere =
+			                {
+				                DALUtil.MakeInParam("@categoryID",SqlDbType.BigInt,4,categoryID)
+			                 };
             return DBCommon.DBHelper.Modify(ConnString, TableName, pramsModify, pramsWhere);
         }
 
@@ -71,7 +86,18 @@ namespace DAL
 			};
             return DBCommon.DBHelper.Modify(ConnString, TableName, pramsModify, pramsWhere);
         }
-
+        public static int Modify_Process( int id)
+        {
+            SqlParameter[] pramsModify =
+			{
+					DALUtil.MakeInParam("@IsProcess",SqlDbType.Int,4,1)
+			};
+            SqlParameter[] pramsWhere =
+			{
+			    DALUtil.MakeInParam("@ID",SqlDbType.Int,4,id)
+			};
+            return DBCommon.DBHelper.Modify(ConnString, TableName, pramsModify, pramsWhere);
+        }   
         #endregion
 
         #region 删除
@@ -151,6 +177,17 @@ namespace DAL
 				};
             DataTable dt = DBCommon.DBHelper.GetDataTable2(ConnString, TableName, SelectIF, pramsWhere, OrderName);
             return DALUtil.ConvertDataTableToEntityList<CategoryInfoEntity>(dt);
+        }
+        /// <summary>
+        /// 循环里面 每次获取10个分类  isLeaf=1 AND  ID >{0}
+        /// </summary>
+        /// <param name="id"> </param>
+        /// <returns></returns>
+        public static List<CategoryInfoEntity> GetList_9()
+        {
+            string sqlText = "SELECT top 10 * FROM dbo.CategoryInfo WHERE   isLeaf=1 and IsProcess=0 ";
+            DataSet ds = DBCommon.DBHelper.Query(ConnString, sqlText );
+            return DALUtil.ConvertDataTableToEntityList<CategoryInfoEntity>(ds.Tables[0]);
         }
         #endregion
 
